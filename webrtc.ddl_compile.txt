@@ -1,0 +1,23 @@
+1. Complete prerequisite: https://chromium.googlesource.com/chromium/src/+/master/docs/windows_build_instructions.md
+
+2. Pull code (in administrative powershell)
+  fetch --nohooks webrtc
+  cd src
+  git config --system core.longpaths true
+  git checkout  refs/remotes/branch-heads/5845
+  cd ..
+  gclient sync -D --force --reset
+
+3. Compilation (in cmd) 
+  setlocal enabledelayedexpansion
+  mkdir "artifacts/lib/x64"
+  gn gen out/ --root="src" --args="is_debug=true is_clang=true target_cpu=\"x64\" use_custom_libcxx=false rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false use_cxx17=true"
+  ninja -C out/ webrtc
+  gn gen out/ --root="src" --args="is_debug=false is_clang=true target_cpu=\"x64\" use_custom_libcxx=false rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false use_cxx17=true"
+  ninja -C out/ webrtc
+
+4. in com.unity.webrtc
+  set SOLUTION_DIR=%cd%\Plugin~
+  cd %SOLUTION_DIR%
+  cmake --preset=x64-windows-msvc
+  cmake --build --preset=release-windows-msvc --target=WebRTCPlugin
